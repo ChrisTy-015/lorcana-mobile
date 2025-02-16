@@ -22,7 +22,9 @@ export default function CardList() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterWishlist, setFilterWishlist] = useState(null);
+  const [filterCollection, setFilterCollection] = useState(null);
   const [wishlistCards, setWishlistCards] = useState([]);
+  const [collectionCards, setCollectionCards] = useState([]);
   const [sorted, setSorted] = useState(false);
 
   const { id } = useLocalSearchParams();
@@ -51,15 +53,24 @@ export default function CardList() {
           }
         );
 
-        // Récupérer la wishlist
+        // Récupérer la wishlist et la collection
         const token = await AsyncStorage.getItem('userToken');
-        const wishlistResponse = await fetch('http://172.20.10.2/api/wishlist', {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const [wishlistResponse, collectionResponse] = await Promise.all([
+          fetch('http://172.20.10.2/api/wishlist', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }),
+          fetch('http://172.20.10.2/api/collection', {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+        ]);
 
         if (!cardsResponse.ok) {
           throw new Error(`Erreur HTTP: ${cardsResponse.status}`);
@@ -82,6 +93,13 @@ export default function CardList() {
             setWishlistCards(wishlistData.map(item => item.card_id));
           }
         }
+
+        if (collectionResponse.ok) {
+          const collectionData = await collectionResponse.json();
+          if (Array.isArray(collectionData)) {
+            setCollectionCards(collectionData.map(item => item.card_id));
+          }
+        }
       } catch (err) {
         console.error("Erreur lors de la récupération des données:", err);
         setError(`Erreur de chargement des données: ${err.message}`);
@@ -98,8 +116,9 @@ export default function CardList() {
     (card) =>
       card.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
       (filterWishlist === null || 
-        (filterWishlist === true ? wishlistCards.includes(card.id) : !wishlistCards.includes(card.id))
-      )
+        (filterWishlist === true ? wishlistCards.includes(card.id) : !wishlistCards.includes(card.id))) &&
+      (filterCollection === null ||
+        (filterCollection === true ? collectionCards.includes(card.id) : !collectionCards.includes(card.id)))
   );
 
   const sortedCards = sorted
@@ -136,9 +155,28 @@ export default function CardList() {
         />
 
         {/* Filtres */}
-        <View style={styles.filters}>
-          <Button title="Wishlist" onPress={() => setFilterWishlist(true)} />
-          <Button title="Toutes" onPress={() => setFilterWishlist(null)} />
+        <View style={styles.filterButtonsContainer}>
+          <Button
+            title="Wishlist"
+            onPress={() => {
+              setFilterWishlist(true);
+              setFilterCollection(null);
+            }}
+          />
+          <Button
+            title="Collection"
+            onPress={() => {
+              setFilterCollection(true);
+              setFilterWishlist(null);
+            }}
+          />
+          <Button
+            title="Toutes"
+            onPress={() => {
+              setFilterWishlist(null);
+              setFilterCollection(null);
+            }}
+          />
         </View>
 
         {/* Bouton de tri */}
@@ -235,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-  filters: {
+  filterButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",

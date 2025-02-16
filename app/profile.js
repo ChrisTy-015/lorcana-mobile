@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 export default function ProfileScreen() {
   const [email, setEmail] = useState('');
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [collectionCount, setCollectionCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -51,6 +52,16 @@ export default function ProfileScreen() {
           }
         });
         
+        // Récupérer les données de la collection
+        const collectionResponse = await fetch('http://172.20.10.2/api/collection', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         if (userResponse.ok) {
           const userData = await userResponse.json();
           setEmail(userData.email);
@@ -65,6 +76,15 @@ export default function ProfileScreen() {
           }
         } else {
           console.error('Erreur de réponse wishlist:', await wishlistResponse.text());
+        }
+        
+        if (collectionResponse.ok) {
+          const collectionData = await collectionResponse.json();
+          if (Array.isArray(collectionData)) {
+            setCollectionCount(collectionData.length);
+          }
+        } else {
+          console.error('Erreur de réponse collection:', await collectionResponse.text());
         }
       } catch (error) {
         console.error('Erreur complète:', error);
@@ -126,6 +146,10 @@ export default function ProfileScreen() {
         <View style={styles.infoContainer}>
           <Text style={styles.infoLabel}>Cartes en Wishlist :</Text>
           <Text style={styles.infoText}>{wishlistCount}</Text>
+        </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoLabel}>Cartes en Collection :</Text>
+          <Text style={styles.infoText}>{collectionCount}</Text>
         </View>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Se déconnecter</Text>
@@ -231,5 +255,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-

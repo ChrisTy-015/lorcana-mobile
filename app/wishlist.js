@@ -107,25 +107,32 @@ export default function Wishlist() {
         <View style={styles.container}>
             <Text style={styles.title}>Ma Wishlist</Text>
 
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-                {wishlistItems.map((card) => (
-                    <TouchableOpacity 
-                        key={card.id} 
-                        style={styles.cardContainer}
-                        onPress={() => router.push(`/cardDetail?id=${card.id}`)}
-                    >
-                        <Image 
-                            source={{ uri: card.image }} 
-                            style={styles.cardImage} 
-                            resizeMode="contain"
-                        />
-                        <View style={styles.cardInfo}>
-                            <Text style={styles.cardName}>{card.name}</Text>
-                            <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
+            <View style={styles.mainContainer}>
+                <ScrollView 
+                    style={styles.scrollView} 
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {wishlistItems.map((card) => (
+                        <View key={card.id} style={styles.cardWrapper}>
+                            <TouchableOpacity 
+                                style={styles.cardContainer}
+                                onPress={() => router.push(`/cardDetail?id=${card.id}`)}
+                            >
+                                <Image 
+                                    source={{ uri: card.image }} 
+                                    style={styles.cardImage} 
+                                    resizeMode="contain"
+                                />
+                                <View style={styles.cardInfo}>
+                                    <Text style={styles.cardName}>{card.name}</Text>
+                                    <Text style={styles.cardSubtitle}>{card.subtitle}</Text>
+                                </View>
+                            </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
+                    ))}
+                </ScrollView>
+            </View>
 
             <View style={styles.bottomNavContainer}>
                 <TouchableOpacity 
@@ -154,9 +161,13 @@ export default function Wishlist() {
 const styles = StyleSheet.create({
     container: { 
         flex: 1, 
-        backgroundColor: '#fff', 
-        paddingTop: 50, 
-        paddingBottom: 90  
+        backgroundColor: '#fff',
+        paddingTop: 50,
+    },
+    mainContainer: {
+        flex: 1,
+        width: '100%',
+        paddingBottom: 90,
     },
     loadingContainer: {
         flex: 1,
@@ -193,40 +204,48 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        padding: 16,
-        paddingBottom: 90,
+        paddingVertical: 16,
+    },
+    cardWrapper: {
+        paddingHorizontal: 16,
+        marginBottom: 16,
+        width: '100%',
     },
     cardContainer: {
         backgroundColor: 'white',
         borderRadius: 16,
         padding: 16,
-        marginBottom: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        elevation: 3,
+        minHeight: 140,
     },
     cardImage: {
-        width: 80,
-        height: 112,
+        width: 100,
+        height: 140,
         borderRadius: 8,
+        marginRight: 16,
     },
     cardInfo: {
         flex: 1,
-        marginLeft: 16,
+        justifyContent: 'center',
+        paddingRight: 8,
     },
     cardName: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#1A202C',
-        marginBottom: 4,
+        marginBottom: 8,
+        flexWrap: 'wrap',
     },
     cardSubtitle: {
         fontSize: 14,
         color: '#4A5568',
+        flexWrap: 'wrap',
     },
     bottomNavContainer: {
         position: 'absolute',

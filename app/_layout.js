@@ -39,6 +39,7 @@ export default function Layout() {
             <Stack.Screen name="cardList" options={{ title: 'Liste des Cartes' }} />
             <Stack.Screen name="cardDetail" options={{ title: 'Détail de la Carte' }} />
             <Stack.Screen name="wishlist" options={{ title: 'Wishlist' }} /> 
+            <Stack.Screen name="collection" options={{ title: 'Ma Collection' }} />
         </Stack>
     ) : null;
 }
