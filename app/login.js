@@ -28,14 +28,22 @@ export default function LoginScreen() {
 
     try {
       console.log("Tentative de connexion avec:", { email, password });
+      console.log("URL de l'API:", "http://172.20.10.2/api/login");
+      
       const response = await fetch("http://172.20.10.2/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": "true"
         },
         body: JSON.stringify({ email, password }),
       });
 
+      console.log("Status de la réponse:", response.status);
+      console.log("Headers de la réponse:", Object.fromEntries(response.headers.entries()));
+      
       const data = await response.json();
       console.log("Réponse de l'API:", data);
 

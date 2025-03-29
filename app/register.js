@@ -14,6 +14,11 @@ export default function RegisterScreen() {
           Alert.alert("Erreur", "Veuillez remplir tous les champs");
           return;
         }
+
+        if (password.length < 6) {
+          Alert.alert("Erreur", "Le mot de passe doit faire au moins 6 caractères");
+          return;
+        }
       
         if (password !== confirmPassword) {
           Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
@@ -21,25 +26,31 @@ export default function RegisterScreen() {
         }
       
         try {
+          console.log("Tentative d'inscription avec:", { name, email });
           const response = await fetch('http://172.20.10.2/api/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Credentials': 'true'
             },
-            body: JSON.stringify({ name, email, password })
+            body: JSON.stringify({ name, email, password, password_confirmation: confirmPassword })
           });
       
           const data = await response.json();
+          console.log("Réponse de l'API:", data);
       
           if (response.ok) {
             Alert.alert("Succès", "Compte créé avec succès", [
               { text: "OK", onPress: () => router.push('/login') }
             ]);
           } else {
-            Alert.alert("Erreur", data.message || "Une erreur est survenue");
+            Alert.alert("Erreur", data.message || "Une erreur est survenue lors de l'inscription");
           }
         } catch (error) {
-          Alert.alert("Erreur", "Impossible de s'inscrire. Veuillez réessayer plus tard.");
+          console.error("Erreur d'inscription:", error);
+          Alert.alert("Erreur", error.message || "Impossible de s'inscrire. Vérifiez votre connexion internet et l'URL de l'API.");
         }
       };
     return (
